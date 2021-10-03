@@ -57,19 +57,41 @@ intersectLineCircle = function (p1, p2, cpt, r) {
   if (di < 0.0) return [];
   let t = sqrt(di);
   ip = [];
-  ip.push(new p5.Vector(D * dv.y + sign(dv.y) * dv.x * t, -D * dv.x + p.abs(dv.y) * t).div(dr * dr).add(cpt));
+  ip.push(new p5.Vector(D * dv.y + sign(dv.y) * dv.x * t, -D * dv.x + abs(dv.y) * t).div(dr * dr).add(cpt));
   if (di > 0.0) {
-    ip.push(new p5.Vector(D * dv.y - sign(dv.y) * dv.x * t, -D * dv.x - p.abs(dv.y) * t).div(dr * dr).add(cpt));
+    ip.push(new p5.Vector(D * dv.y - sign(dv.y) * dv.x * t, -D * dv.x - abs(dv.y) * t).div(dr * dr).add(cpt));
   }
   return ip;
 };
 
+//calculate helper lines, and maybe drawem too
 function drawHelperLines(drawit) {
   rectradi = (radi / 4) * 3; //main square radius
-  chinh = cy + rectradi * 2;
+  chinh = cy + rectradi * chinlength;
   chinxc = cx;
   chinxl = cx - chinw * rectradi;
   chinxr = cx + chinw * rectradi;
+  //bottom line intersection with circle
+  let p1 = new p5.Vector(cx - rectradi, cy + rectradi);
+  let p2 = new p5.Vector(cx + rectradi, cy + rectradi);
+  let cpt = new p5.Vector(cx, cy);
+  jawpoint = intersectLineCircle(p1, p2, cpt, radi);
+  //temple points intersections, top and a little below top
+  p1 = new p5.Vector(cx - rectradi, cy - rectradi);
+  p2 = new p5.Vector(cx + rectradi, cy - rectradi);
+  tmpl1point = intersectLineCircle(p1, p2, cpt, radi);
+  p1 = new p5.Vector(cx - rectradi, cy - rectradi);
+  p2 = new p5.Vector(cx - rectradi, cy);
+  tmpl2left = intersectLineCircle(p1, p2, cpt, radi);
+  p1 = new p5.Vector(cx + rectradi, cy - rectradi);
+  p2 = new p5.Vector(cx + rectradi, cy);
+  tmpl2right = intersectLineCircle(p1, p2, cpt, radi);
+  p1 = new p5.Vector(cx - rectradi - earendw * radi, cy - rectradi);
+  p2 = new p5.Vector(cx - rectradi - earendw * radi, cy);
+  tmpl3left = intersectLineCircle(p1, p2, cpt, radi);
+  p1 = new p5.Vector(cx + rectradi + earendw * radi, cy - rectradi);
+  p2 = new p5.Vector(cx + rectradi + earendw * radi, cy);
+  tmpl3right = intersectLineCircle(p1, p2, cpt, radi);
 
   //actually draw it?
   if (drawit) {
@@ -78,12 +100,68 @@ function drawHelperLines(drawit) {
     strokeWeight(pwidth);
     rectMode(CENTER);
     circle(cx, cy, radi * 2); //main circle
+    line(cx - radi, cy, cx + radi, cy);
+    line(cx, cy - radi, cx, cy + radi);
     rect(cx, cy, rectradi * 2, rectradi * 2); //main square
     //chin points
-    circle(chinxc, chinh, 5);
-    circle(chinxl, chinh, 5);
-    circle(chinxr, chinh, 5);
+    circle(chinxl, chinh, ppw);
+    circle(chinxc, chinh + chinp * radi, ppw);
+    circle(chinxr, chinh, ppw);
+    //jaw points, right then left
+    circle(jawpoint[0].x, jawpoint[0].y, ppw);
+    circle(jawpoint[1].x, jawpoint[1].y, ppw);
+    //temple points
+    circle(cx, cy - radi, ppw);
+    circle(tmpl1point[0].x, tmpl1point[0].y, ppw);
+    circle(tmpl1point[1].x, tmpl1point[1].y, ppw);
+    circle(tmpl2left[1].x, tmpl2left[1].y, ppw);
+    circle(tmpl2right[1].x, tmpl2right[1].y, ppw);
+    circle(tmpl3left[1].x, tmpl3left[1].y, ppw);
+    circle(tmpl3right[1].x, tmpl3right[1].y, ppw);
   }
+}
+
+//draw actual face lines
+function drawActual() {
+  curveTightness(curve_tightness);
+  //fill(rfill);
+  noFill();
+  stroke(rstroke);
+  strokeWeight(rwidth);
+  //jawline
+  beginShape();
+  curveVertex(cx - rectradi, cy + jawtop * rectradi - 0.1 * rectradi);
+  curveVertex(cx - rectradi, cy + jawtop * rectradi);
+  curveVertex(jawpoint[1].x, jawpoint[1].y);
+  curveVertex(chinxl, chinh);
+  curveVertex(chinxc, chinh + chinp * radi);
+  curveVertex(chinxr, chinh);
+  curveVertex(jawpoint[0].x, jawpoint[0].y);
+  curveVertex(cx + rectradi, cy + jawtop * rectradi);
+  curveVertex(cx + rectradi, cy + jawtop * rectradi - 0.1 * rectradi);
+  endShape();
+  //center mouth
+  beginShape();
+  vertex(cx - mouthw * radi, cy + radi);
+  curveVertex(cx - mouthw * radi, cy + radi);
+  curveVertex(cx, cy + (1 + mouthh) * radi);
+  curveVertex(cx + mouthw * radi, cy + radi);
+  vertex(cx + mouthw * radi, cy + radi);
+  endShape();
+  //top skull
+  beginShape();
+  vertex(cx - rectradi - earendw * radi, cy - earendh * radi * 1.1);
+  curveVertex(cx - rectradi - earendw * radi, cy - earendh * radi);
+  curveVertex(tmpl3left[1].x, tmpl3left[1].y);
+  curveVertex(tmpl2left[1].x, tmpl2left[1].y);
+  curveVertex(tmpl1point[1].x, tmpl1point[1].y, ppw);
+  curveVertex(cx, cy - radi);
+  curveVertex(tmpl1point[0].x, tmpl1point[0].y, ppw);
+  curveVertex(tmpl2right[1].x, tmpl2right[1].y, ppw);
+  curveVertex(tmpl3right[1].x, tmpl3right[1].y);
+  curveVertex(cx + rectradi + earendw * radi, cy - earendh * radi);
+  vertex(cx + rectradi + earendw * radi, cy - earendh * radi);
+  endShape();
 }
 /*******************************************************************************/
 /*******************************************************************************/
@@ -96,7 +174,11 @@ var cx, cy; //circle center
 var radi; //circle radius
 var rectradi; //main square radius
 var pstroke, pfill, pwidth; //pencil lines
-var chinw, chinh, chinxl, chinxc, chinxr; //chin line width, height, left, center, right points
+var chinw, chinh, chinp, chinxl, chinxc, chinxr, chinlength; //chin line width, cpoint height, height, left, center, right points, chin distance down
+var jawpoint, jawtop; //jawpoint is where circle and rect intersect, jawtop-jaw meets ears
+var mouthw, mouthh;
+var curve_tightness;
+var tmpl1point, tmpl2left, tmpl2right, tmpl3left, tmpl3right, earendh, earendw;
 
 function setup() {
   tWIDTH = window.innerWidth;
@@ -111,17 +193,36 @@ function setup() {
   pstroke = color(0, 0, 255, 30); //pencil stroke
   pfill = color(0, 10); //pencil fill
   pwidth = 1; //pencil stroke weight
-  chinw = 0.1; //chin bottom line, in radi units
+  rstroke = color(30); //real stroke
+  rfill = color(0, 30); //real fill
+  rwidth = 2; //real stroke weight
+  chinw = 0.3; //chin line, in radi units
+  chinp = 0.1; //chin point height, in radi units
+  chinlength = 1.8; // chin distance from center in radi
+  mouthw = 0.17;
+  mouthh = 0.01;
+  jawtop = 0.5;
+  earendh = 0.1;
+  earendw = 0.1;
+  ppw = 10; //pencil point width in pixels
+  curve_tightness = 0.0;
 
   //GUI stuff
   gui = createGui("control");
   sliderRange(1, DIM, 1);
-  gui.addGlobals("cx", "cy", "radi");
-  sliderRange(0, 1, 0.02);
-  gui.addGlobals("chinw");
+  gui.addGlobals("radi");
+  sliderRange(0, 1, 0.01);
+  gui.addGlobals("chinw", "jawtop");
+  sliderRange(1.5, 2.5, 0.01);
+  gui.addGlobals("chinlength");
+  sliderRange(-1.5, 1.5, 0.01);
+  gui.addGlobals("chinlength", "chinp", "mouthw", "mouthh", "earendh", "earendw");
+  sliderRange(-5, 5, 0.01);
+  gui.addGlobals("curve_tightness");
 }
 
 function draw() {
   background(250);
   drawHelperLines(true);
+  drawActual();
 }
