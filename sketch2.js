@@ -100,6 +100,23 @@ function drawHelperLines(drawit) {
     strokeWeight(pwidth);
     rectMode(CENTER);
     circle(cx, cy, radi * 2); //main circle
+    //helper circles, from radius 0 to radi*1.5
+    for (var ci = 1; ci <= num_circles; ci++) {
+      noFill();
+      circle(cx, cy, (ci * (radi * 3)) / num_circles);
+      fill(pfill);
+      textSize(8);
+      text(ci, cx + (ci * (radi * 1.5)) / num_circles - 10, cy);
+    }
+    //helper slices
+    for (var ci = 1; ci <= num_slices; ci++) {
+      let angle = (ci - 1) * (360 / num_slices) + 270;
+      tx = cos(radians(angle)) * radi * 1.5;
+      ty = sin(radians(angle)) * radi * 1.5;
+      line(cx, cy, cx + tx, cy + ty);
+      textSize(8);
+      text(ci, cx + tx + 5, cy + ty + 5);
+    }
     line(cx - radi, cy, cx + radi, cy);
     line(cx, cy - radi, cx, cy + radi);
     rect(cx, cy, rectradi * 2, rectradi * 2); //main square
@@ -177,7 +194,7 @@ var pstroke, pfill, pwidth; //pencil lines
 var chinw, chinh, chinp, chinxl, chinxc, chinxr, chinlength; //chin line width, cpoint height, height, left, center, right points, chin distance down
 var jawpoint, jawtop; //jawpoint is where circle and rect intersect, jawtop-jaw meets ears
 var mouthw, mouthh;
-var curve_tightness;
+var curve_tightness, num_circles, num_slices;
 var tmpl1point, tmpl2left, tmpl2right, tmpl3left, tmpl3right, earendh, earendw;
 
 function setup() {
@@ -196,9 +213,9 @@ function setup() {
   rstroke = color(30); //real stroke
   rfill = color(0, 30); //real fill
   rwidth = 2; //real stroke weight
-  chinw = 0.3; //chin line, in radi units
-  chinp = 0.1; //chin point height, in radi units
-  chinlength = 1.8; // chin distance from center in radi
+  chinw = 0.4; //chin line, in radi units
+  chinp = 0.07; //chin point height, in radi units
+  chinlength = 1.71; // chin distance from center in radi
   mouthw = 0.17;
   mouthh = 0.01;
   jawtop = 0.5;
@@ -206,11 +223,17 @@ function setup() {
   earendw = 0.1;
   ppw = 10; //pencil point width in pixels
   curve_tightness = 0.0;
+  num_circles = 12;
+  num_slices = 24;
 
   //GUI stuff
   gui = createGui("control");
   sliderRange(1, DIM, 1);
   gui.addGlobals("radi");
+  sliderRange(1, 24, 1);
+  gui.addGlobals("num_circles");
+  sliderRange(1, 36, 1);
+  gui.addGlobals("num_slices");
   sliderRange(0, 1, 0.01);
   gui.addGlobals("chinw", "jawtop");
   sliderRange(1.5, 2.5, 0.01);
