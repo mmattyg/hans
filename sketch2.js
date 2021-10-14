@@ -39,7 +39,7 @@ tokenData = { hash: random_hash() };
 //tokenData = { hash: "0x6666667676712344321654321654321654321654321654767676763216543216" };
 let hash = tokenData.hash;
 
-let seed = parseInt(tokenData.hash.slice(0, 16), 16);
+let seed = parseInt(tokenData.hash.slice(2, 10), 16);
 let R = new NewRandom(seed);
 
 //get circle-line intersection points
