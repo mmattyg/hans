@@ -42,144 +42,155 @@ let hash = tokenData.hash;
 let seed = parseInt(tokenData.hash.slice(2, 10), 16);
 let R = new NewRandom(seed);
 
-//get circle-line intersection points
-intersectLineCircle = function (p1, p2, cpt, r) {
-  let sign = function (x) {
-    return x < 0.0 ? -1 : 1;
-  };
-  let x1 = p1.copy().sub(cpt);
-  let x2 = p2.copy().sub(cpt);
-  let dv = x2.copy().sub(x1);
-  let dr = dv.mag();
-  let D = x1.x * x2.y - x2.x * x1.y;
-  // evaluate if there is an intersection
-  let di = r * r * dr * dr - D * D;
-  if (di < 0.0) return [];
-  let t = sqrt(di);
-  ip = [];
-  ip.push(new p5.Vector(D * dv.y + sign(dv.y) * dv.x * t, -D * dv.x + abs(dv.y) * t).div(dr * dr).add(cpt));
-  if (di > 0.0) {
-    ip.push(new p5.Vector(D * dv.y - sign(dv.y) * dv.x * t, -D * dv.x - abs(dv.y) * t).div(dr * dr).add(cpt));
-  }
-  return ip;
-};
-
-//calculate helper lines, and maybe drawem too
-function drawHelperLines(drawit) {
-  rectradi = (radi / 4) * 3; //main square radius
-  chinh = cy + rectradi * chinlength;
-  chinxc = cx;
-  chinxl = cx - chinw * rectradi;
-  chinxr = cx + chinw * rectradi;
-  //bottom line intersection with circle
-  let p1 = new p5.Vector(cx - rectradi, cy + rectradi);
-  let p2 = new p5.Vector(cx + rectradi, cy + rectradi);
-  let cpt = new p5.Vector(cx, cy);
-  jawpoint = intersectLineCircle(p1, p2, cpt, radi);
-  //temple points intersections, top and a little below top
-  p1 = new p5.Vector(cx - rectradi, cy - rectradi);
-  p2 = new p5.Vector(cx + rectradi, cy - rectradi);
-  tmpl1point = intersectLineCircle(p1, p2, cpt, radi);
-  p1 = new p5.Vector(cx - rectradi, cy - rectradi);
-  p2 = new p5.Vector(cx - rectradi, cy);
-  tmpl2left = intersectLineCircle(p1, p2, cpt, radi);
-  p1 = new p5.Vector(cx + rectradi, cy - rectradi);
-  p2 = new p5.Vector(cx + rectradi, cy);
-  tmpl2right = intersectLineCircle(p1, p2, cpt, radi);
-  p1 = new p5.Vector(cx - rectradi - earendw * radi, cy - rectradi);
-  p2 = new p5.Vector(cx - rectradi - earendw * radi, cy);
-  tmpl3left = intersectLineCircle(p1, p2, cpt, radi);
-  p1 = new p5.Vector(cx + rectradi + earendw * radi, cy - rectradi);
-  p2 = new p5.Vector(cx + rectradi + earendw * radi, cy);
-  tmpl3right = intersectLineCircle(p1, p2, cpt, radi);
-
-  //actually draw it?
-  if (drawit) {
-    fill(pfill);
-    stroke(pstroke);
-    strokeWeight(pwidth);
-    rectMode(CENTER);
-    circle(cx, cy, radi * 2); //main circle
-    //helper circles, from radius 0 to radi*1.5
-    for (var ci = 1; ci <= num_circles; ci++) {
-      noFill();
-      circle(cx, cy, (ci * (radi * 3)) / num_circles);
-      fill(pfill);
-      textSize(8);
-      text(ci, cx + (ci * (radi * 1.5)) / num_circles - 10, cy);
-    }
-    //helper slices
-    for (var ci = 1; ci <= num_slices; ci++) {
-      let angle = (ci - 1) * (360 / num_slices) + 270;
-      tx = cos(radians(angle)) * radi * 1.5;
-      ty = sin(radians(angle)) * radi * 1.5;
-      line(cx, cy, cx + tx, cy + ty);
-      textSize(8);
-      text(ci, cx + tx + 5, cy + ty + 5);
-    }
-    line(cx - radi, cy, cx + radi, cy);
-    line(cx, cy - radi, cx, cy + radi);
-    rect(cx, cy, rectradi * 2, rectradi * 2); //main square
-    //chin points
-    circle(chinxl, chinh, ppw);
-    circle(chinxc, chinh + chinp * radi, ppw);
-    circle(chinxr, chinh, ppw);
-    //jaw points, right then left
-    circle(jawpoint[0].x, jawpoint[0].y, ppw);
-    circle(jawpoint[1].x, jawpoint[1].y, ppw);
-    //temple points
-    circle(cx, cy - radi, ppw);
-    circle(tmpl1point[0].x, tmpl1point[0].y, ppw);
-    circle(tmpl1point[1].x, tmpl1point[1].y, ppw);
-    circle(tmpl2left[1].x, tmpl2left[1].y, ppw);
-    circle(tmpl2right[1].x, tmpl2right[1].y, ppw);
-    circle(tmpl3left[1].x, tmpl3left[1].y, ppw);
-    circle(tmpl3right[1].x, tmpl3right[1].y, ppw);
-  }
+function c2p(r, theta) {
+  let x = r * cos(theta);
+  let y = r * sin(theta);
+  return [x, y];
 }
-
-//draw actual face lines
-function drawActual() {
-  curveTightness(curve_tightness);
-  //fill(rfill);
+function drawCurve(pts, offsetx = 0, offsety = 0, mirror = false) {
+  push();
+  translate(cx, cy);
   noFill();
-  stroke(rstroke);
-  strokeWeight(rwidth);
-  //jawline
+  stroke(30);
+  strokeWeight(2);
+  offsetx = mirror ? -offsetx : offsetx;
   beginShape();
-  curveVertex(cx - rectradi, cy + jawtop * rectradi - 0.1 * rectradi);
-  curveVertex(cx - rectradi, cy + jawtop * rectradi);
-  curveVertex(jawpoint[1].x, jawpoint[1].y);
-  curveVertex(chinxl, chinh);
-  curveVertex(chinxc, chinh + chinp * radi);
-  curveVertex(chinxr, chinh);
-  curveVertex(jawpoint[0].x, jawpoint[0].y);
-  curveVertex(cx + rectradi, cy + jawtop * rectradi);
-  curveVertex(cx + rectradi, cy + jawtop * rectradi - 0.1 * rectradi);
+  for (var i = 0; i < pts.length; i++) {
+    if (mirror) {
+      pts[i][0] *= -1;
+    }
+    curveVertex(pts[i][0] + offsetx, pts[i][1] + offsety);
+  }
   endShape();
-  //center mouth
-  beginShape();
-  vertex(cx - mouthw * radi, cy + radi);
-  curveVertex(cx - mouthw * radi, cy + radi);
-  curveVertex(cx, cy + (1 + mouthh) * radi);
-  curveVertex(cx + mouthw * radi, cy + radi);
-  vertex(cx + mouthw * radi, cy + radi);
-  endShape();
-  //top skull
-  beginShape();
-  vertex(cx - rectradi - earendw * radi, cy - earendh * radi * 1.1);
-  curveVertex(cx - rectradi - earendw * radi, cy - earendh * radi);
-  curveVertex(tmpl3left[1].x, tmpl3left[1].y);
-  curveVertex(tmpl2left[1].x, tmpl2left[1].y);
-  curveVertex(tmpl1point[1].x, tmpl1point[1].y, ppw);
-  curveVertex(cx, cy - radi);
-  curveVertex(tmpl1point[0].x, tmpl1point[0].y, ppw);
-  curveVertex(tmpl2right[1].x, tmpl2right[1].y, ppw);
-  curveVertex(tmpl3right[1].x, tmpl3right[1].y);
-  curveVertex(cx + rectradi + earendw * radi, cy - earendh * radi);
-  vertex(cx + rectradi + earendw * radi, cy - earendh * radi);
-  endShape();
+
+  //debug:draw helper circles
+  stroke(0, 0, 255, 45);
+  strokeWeight(1);
+  for (var i = 0; i < pts.length; i++) {
+    circle(pts[i][0] + offsetx, pts[i][1] + offsety, ppw);
+  }
+  pop();
 }
+
+//top of skull
+function prt_top() {
+  let crv = [];
+  crv.push(c2p((radi * 28) / 32, 180));
+  crv.push(c2p((radi * 28) / 32, 188));
+  crv.push(c2p((radi * 28.7) / 32, 195));
+  crv.push(c2p((radi * 31) / 32, 210));
+  for (var i = 225; i <= 315; i += 15) {
+    crv.push(c2p(radi, i));
+  }
+  crv.push(c2p((radi * 31) / 32, 330));
+  crv.push(c2p((radi * 28.7) / 32, 345));
+  crv.push(c2p((radi * 28) / 32, 353));
+  crv.push(c2p((radi * 28) / 32, 360));
+  return crv;
+}
+//jaw part
+function prt_jaw() {
+  let crv = [];
+  crv.push(c2p((radi * 28) / 32, 20));
+  crv.push(c2p((radi * 28) / 32, 30));
+  crv.push(c2p((radi * 32) / 32, 45));
+  crv.push(c2p((radi * 36) / 32, 55));
+  crv.push(c2p((radi * 40) / 32, 65));
+  crv.push(c2p((radi * 44) / 32, 75));
+
+  crv.push(c2p((radi * 44) / 32, 90));
+
+  crv.push(c2p((radi * 44) / 32, 105));
+  crv.push(c2p((radi * 40) / 32, 115));
+  crv.push(c2p((radi * 36) / 32, 125));
+  crv.push(c2p((radi * 32) / 32, 135));
+  crv.push(c2p((radi * 28) / 32, 150));
+  crv.push(c2p((radi * 28) / 32, 160));
+  return crv;
+}
+
+//mouth part
+function prt_mth() {
+  let crv = [];
+  crv.push(c2p((radi * 32) / 32, 50));
+  crv.push(c2p((radi * 32) / 32, 75));
+  crv.push(c2p((radi * 32) / 32, 90));
+  crv.push(c2p((radi * 32) / 32, 105));
+  crv.push(c2p((radi * 32) / 32, 120));
+  return crv;
+}
+
+//eyes
+function prt_eyes() {
+  //anchor pupils, left and right
+  let rc = c2p((radi * 12) / 32, 0);
+  let lc = c2p((radi * 12) / 32, 180);
+
+  push();
+  translate(cx, cy);
+  fill(0);
+  //pupils
+  circle(rc[0], rc[1], radi / 25);
+  circle(lc[0], lc[1], radi / 25);
+  //iris
+  noFill();
+  stroke(30);
+  strokeWeight(2);
+  arc(rc[0], rc[1], radi / 7, radi / 7, -80, 80);
+  arc(rc[0], rc[1], radi / 7, radi / 7, 100, 260);
+  arc(lc[0], lc[1], radi / 7, radi / 7, -80, 80);
+  arc(lc[0], lc[1], radi / 7, radi / 7, 100, 260);
+  pop();
+
+  let crv = []; //top arc
+  crv.push([rc[0] - radi / 6, rc[1]]);
+  crv.push([rc[0] - radi / 6, rc[1]]);
+  crv.push([rc[0] - radi / 9, rc[1] - radi / 22]);
+  crv.push([rc[0], rc[1] - radi / 14]); //top
+  crv.push([rc[0] + radi / 9, rc[1] - radi / 22]);
+  crv.push([rc[0] + radi / 6.2, rc[1]]);
+  crv.push([rc[0] + radi / 6.2, rc[1]]);
+  drawCurve(crv);
+  drawCurve(crv, 0, 0, true);
+
+  crv = []; //bottom arc
+  crv.push([rc[0] - radi / 6.5, rc[1]]);
+  crv.push([rc[0] - radi / 6.5, rc[1]]);
+  crv.push([rc[0] - radi / 9, rc[1] + radi / 32]);
+  crv.push([rc[0], rc[1] + radi / 20]); //bottom
+  crv.push([rc[0] + radi / 9, rc[1] + radi / 42]);
+  crv.push([rc[0] + radi / 6.2, rc[1] - radi / 32]);
+  crv.push([rc[0] + radi / 6.2, rc[1] - radi / 32]);
+  drawCurve(crv, 0, radi / 32);
+  drawCurve(crv, 0, radi / 32, true);
+}
+
+//draw helper lines
+function drawHelperLines() {
+  stroke(0, 0, 255, 30);
+  fill(0, 10);
+  strokeWeight(1);
+  rectMode(CENTER);
+  circle(cx, cy, radi * 2); //main circle
+  //helper circles, from radius 0 to radi*1.5
+  for (var ci = 1; ci <= num_circles; ci++) {
+    noFill();
+    circle(cx, cy, (ci * (radi * 3)) / num_circles);
+    fill(0, 10);
+    textSize(8);
+    text(ci * 4, cx + (ci * (radi * 1.5)) / num_circles - 10, cy);
+  }
+  //helper slices
+  for (var ci = 0; ci < num_slices; ci++) {
+    let angle = ci * (360 / num_slices);
+    tx = cos(angle) * radi * 1.5;
+    ty = sin(angle) * radi * 1.5;
+    line(cx, cy, cx + tx, cy + ty);
+    textSize(9);
+    text(angle, cx + tx + 5, cy + ty + 5);
+  }
+}
+
 /*******************************************************************************/
 /*******************************************************************************/
 /*******************************************************************************/
@@ -205,23 +216,11 @@ function setup() {
   createCanvas(DIM, DIM);
   cx = cy = DIM / 2;
 
+  angleMode(DEGREES);
+
   //starting values
   radi = DIM * 0.3;
-  pstroke = color(0, 0, 255, 30); //pencil stroke
-  pfill = color(0, 10); //pencil fill
-  pwidth = 1; //pencil stroke weight
-  rstroke = color(30); //real stroke
-  rfill = color(0, 30); //real fill
-  rwidth = 2; //real stroke weight
-  chinw = 0.4; //chin line, in radi units
-  chinp = 0.07; //chin point height, in radi units
-  chinlength = 1.71; // chin distance from center in radi
-  mouthw = 0.17;
-  mouthh = 0.01;
-  jawtop = 0.5;
-  earendh = 0.1;
-  earendw = 0.1;
-  ppw = 10; //pencil point width in pixels
+  ppw = 6; //pencil point width in pixels
   curve_tightness = 0.0;
   num_circles = 12;
   num_slices = 24;
@@ -230,22 +229,13 @@ function setup() {
   gui = createGui("control");
   sliderRange(1, DIM, 1);
   gui.addGlobals("radi");
-  sliderRange(1, 24, 1);
-  gui.addGlobals("num_circles");
-  sliderRange(1, 36, 1);
-  gui.addGlobals("num_slices");
-  sliderRange(0, 1, 0.01);
-  gui.addGlobals("chinw", "jawtop");
-  sliderRange(1.5, 2.5, 0.01);
-  gui.addGlobals("chinlength");
-  sliderRange(-1.5, 1.5, 0.01);
-  gui.addGlobals("chinlength", "chinp", "mouthw", "mouthh", "earendh", "earendw");
-  sliderRange(-5, 5, 0.01);
-  gui.addGlobals("curve_tightness");
 }
 
 function draw() {
   background(250);
   drawHelperLines(true);
-  drawActual();
+  drawCurve(prt_top());
+  drawCurve(prt_jaw());
+  drawCurve(prt_mth());
+  prt_eyes();
 }
