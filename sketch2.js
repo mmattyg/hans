@@ -67,56 +67,104 @@ function drawCurve(pts, offsetx = 0, offsety = 0, mirror = false) {
   stroke(0, 0, 255, 45);
   strokeWeight(1);
   for (var i = 0; i < pts.length; i++) {
-    circle(pts[i][0] + offsetx, pts[i][1] + offsety, ppw);
+    if (!mirror) circle(pts[i][0] + offsetx, pts[i][1] + offsety, ppw);
   }
   pop();
 }
 
-//top of skull
-function prt_top() {
+//bottom hairline
+function prt_bhair() {
   let crv = [];
-  crv.push(c2p((radi * 28) / 32, 180));
-  crv.push(c2p((radi * 28) / 32, 188));
-  crv.push(c2p((radi * 28.7) / 32, 195));
-  crv.push(c2p((radi * 31) / 32, 210));
-  for (var i = 225; i <= 315; i += 15) {
+  crv.push(c2p((radi * 28) / 32, 255));
+  crv.push(c2p((radi * 30) / 32, 270));
+  for (var i = 285; i <= 315; i += 15) {
     crv.push(c2p(radi, i));
   }
-  crv.push(c2p((radi * 31) / 32, 330));
-  crv.push(c2p((radi * 28.7) / 32, 345));
+  crv.push(c2p((radi * 30) / 32, 330));
+  crv.push(c2p((radi * 28) / 32, 345));
   crv.push(c2p((radi * 28) / 32, 353));
   crv.push(c2p((radi * 28) / 32, 360));
+  crv.push(c2p((radi * 28) / 32, 360));
+  return crv;
+}
+//top hairline
+function prt_thair() {
+  let crv = [];
+  crv.push(c2p((radi * 44) / 32, 255));
+  crv.push(c2p((radi * 44) / 32, 270));
+
+  crv.push(c2p((radi * 43) / 32, 285));
+  crv.push(c2p((radi * 42) / 32, 300));
+  crv.push(c2p((radi * 41) / 32, 315));
+
+  crv.push(c2p((radi * 36) / 32, 330));
+  crv.push(c2p((radi * 32) / 32, 345));
+  crv.push(c2p((radi * 31) / 32, 353));
+  crv.push(c2p((radi * 30.5) / 32, 357.5));
+  crv.push(c2p((radi * 30) / 32, 10));
   return crv;
 }
 //jaw part
 function prt_jaw() {
   let crv = [];
-  crv.push(c2p((radi * 28) / 32, 20));
-  crv.push(c2p((radi * 28) / 32, 30));
-  crv.push(c2p((radi * 32) / 32, 45));
-  crv.push(c2p((radi * 36) / 32, 55));
-  crv.push(c2p((radi * 40) / 32, 65));
-  crv.push(c2p((radi * 44) / 32, 75));
 
-  crv.push(c2p((radi * 44) / 32, 90));
+  crv.push(c2p((radi * 40) / 32, 75));
+
+  crv.push(c2p((radi * 43) / 32, 90));
 
   crv.push(c2p((radi * 44) / 32, 105));
   crv.push(c2p((radi * 40) / 32, 115));
   crv.push(c2p((radi * 36) / 32, 125));
   crv.push(c2p((radi * 32) / 32, 135));
-  crv.push(c2p((radi * 28) / 32, 150));
-  crv.push(c2p((radi * 28) / 32, 160));
+  crv.push(c2p((radi * 27.3) / 32, 152));
+  crv.push(c2p((radi * 26) / 32, 160));
   return crv;
 }
 
-//mouth part
-function prt_mth() {
+//bottom mouth line
+function prt_bmth() {
   let crv = [];
   crv.push(c2p((radi * 32) / 32, 50));
   crv.push(c2p((radi * 32) / 32, 75));
   crv.push(c2p((radi * 32) / 32, 90));
   crv.push(c2p((radi * 32) / 32, 105));
-  crv.push(c2p((radi * 32) / 32, 120));
+  return crv;
+}
+//mid mouth line right-to-left
+function prt_mmth() {
+  let crv = [];
+  crv.push(c2p((radi * 34) / 32, 65));
+  crv.push(c2p((radi * 31) / 32, 70));
+  crv.push(c2p((radi * 29.7) / 32, 75));
+  crv.push(c2p((radi * 28.7) / 32, 80));
+  crv.push(c2p((radi * 28.7) / 32, 90));
+  crv.push(c2p((radi * 32) / 32, 106));
+  return crv;
+}
+//top mouth line
+function prt_tmth() {
+  let crv = [];
+  crv.push(c2p((radi * 31) / 32, 60));
+  crv.push(c2p((radi * 27) / 32, 78));
+  crv.push(c2p((radi * 25.5) / 32, 84));
+  crv.push(c2p((radi * 26) / 32, 90));
+  crv.push(c2p((radi * 27) / 32, 105));
+  return crv;
+}
+
+//ears
+function prt_ear() {
+  let crv = [];
+  crv.push(c2p((radi * 26) / 32, 5));
+  crv.push(c2p((radi * 26) / 32, 5));
+  crv.push(c2p((radi * 28) / 32, 0));
+  crv.push(c2p((radi * 31) / 32, -2));
+  crv.push(c2p((radi * 34) / 32, 6));
+  crv.push(c2p((radi * 34) / 32, 15));
+  crv.push(c2p((radi * 33) / 32, 30));
+  crv.push(c2p((radi * 31) / 32, 34));
+  crv.push(c2p((radi * 28) / 32, 32));
+  crv.push(c2p((radi * 24) / 32, 22));
   return crv;
 }
 
@@ -136,20 +184,20 @@ function prt_eyes() {
   noFill();
   stroke(30);
   strokeWeight(2);
-  arc(rc[0], rc[1], radi / 7, radi / 7, -80, 80);
-  arc(rc[0], rc[1], radi / 7, radi / 7, 100, 260);
-  arc(lc[0], lc[1], radi / 7, radi / 7, -80, 80);
-  arc(lc[0], lc[1], radi / 7, radi / 7, 100, 260);
+  arc(rc[0], rc[1], radi / 7, radi / 7, -50, 90);
+  arc(rc[0], rc[1], radi / 7, radi / 7, 90, 230);
+  arc(lc[0], lc[1], radi / 7, radi / 7, -50, 90);
+  arc(lc[0], lc[1], radi / 7, radi / 7, 90, 230);
   pop();
 
-  let crv = []; //top arc
+  let crv = []; //top arc, right from right to left
+  crv.push([rc[0] - radi / 5, rc[1]]);
   crv.push([rc[0] - radi / 6, rc[1]]);
-  crv.push([rc[0] - radi / 6, rc[1]]);
-  crv.push([rc[0] - radi / 9, rc[1] - radi / 22]);
-  crv.push([rc[0], rc[1] - radi / 14]); //top
-  crv.push([rc[0] + radi / 9, rc[1] - radi / 22]);
+  crv.push([rc[0] - radi / 9, rc[1] - radi / 32]);
+  crv.push([rc[0], rc[1] - radi / 15]); //top
+  crv.push([rc[0] + radi / 9, rc[1] - radi / 32]);
   crv.push([rc[0] + radi / 6.2, rc[1]]);
-  crv.push([rc[0] + radi / 6.2, rc[1]]);
+  crv.push([rc[0] + radi / 5, rc[1]]);
   drawCurve(crv);
   drawCurve(crv, 0, 0, true);
 
@@ -165,6 +213,85 @@ function prt_eyes() {
   drawCurve(crv, 0, radi / 32, true);
 }
 
+//under eye
+function prt_beye() {
+  let crv = [];
+  crv.push(c2p((radi * 18) / 32, 0));
+  crv.push(c2p((radi * 18) / 32, 7));
+  crv.push(c2p((radi * 16) / 32, 13));
+  crv.push(c2p((radi * 13) / 32, 20));
+  crv.push(c2p((radi * 9) / 32, 31));
+  return crv;
+}
+
+//above eye
+function prt_teye() {
+  let crv = [];
+  crv.push(c2p((radi * 20) / 32, 4));
+  crv.push(c2p((radi * 18) / 32, 0));
+  crv.push(c2p((radi * 16) / 32, 350));
+  crv.push(c2p((radi * 12.5) / 32, 342));
+  crv.push(c2p((radi * 8) / 32, 342));
+  crv.push(c2p((radi * 4) / 32, 345));
+  return crv;
+}
+
+//low brow
+function prt_bbro() {
+  let crv = [];
+  crv.push(c2p((radi * 24) / 32, 355));
+  crv.push(c2p((radi * 19) / 32, 348));
+  //crv.push(c2p((radi * 19) / 32, 340));
+  crv.push(c2p((radi * 14) / 32, 335));
+  crv.push(c2p((radi * 8) / 32, 315));
+  crv.push(c2p((radi * 6) / 32, 270));
+  return crv;
+}
+//high brow
+function prt_tbro() {
+  let crv = [];
+  crv.push(c2p((radi * 24) / 32, 355));
+  crv.push(c2p((radi * 20) / 32, 348));
+  //crv.push(c2p((radi * 20) / 32, 338));
+  crv.push(c2p((radi * 16) / 32, 332));
+  crv.push(c2p((radi * 11) / 32, 315));
+  crv.push(c2p((radi * 9) / 32, 270));
+  return crv;
+}
+
+//nostrils, from inside out
+function prt_nos1() {
+  let crv = [];
+  crv.push(c2p((radi * 19) / 32, 95));
+  crv.push(c2p((radi * 20) / 32, 90));
+  crv.push(c2p((radi * 19.4) / 32, 83));
+  crv.push(c2p((radi * 18.5) / 32, 78));
+  crv.push(c2p((radi * 19.5) / 32, 73));
+  crv.push(c2p((radi * 21) / 32, 67));
+  return crv;
+}
+function prt_nos2() {
+  let crv = [];
+  crv.push(c2p((radi * 19) / 32, 95));
+  crv.push(c2p((radi * 20) / 32, 78));
+  crv.push(c2p((radi * 21) / 32, 72));
+  crv.push(c2p((radi * 20) / 32, 68));
+  crv.push(c2p((radi * 17) / 32, 68));
+  crv.push(c2p((radi * 14) / 32, 75));
+  return crv;
+}
+function prt_nose() {
+  let crv = [];
+  crv.push(c2p((radi * 4) / 32, 315));
+  crv.push(c2p((radi * 2) / 32, 0));
+  crv.push(c2p((radi * 4) / 32, 70));
+  //crv.push(c2p((radi * 8) / 32, 76));
+  crv.push(c2p((radi * 10) / 32, 78));
+  crv.push(c2p((radi * 16) / 32, 82));
+  crv.push(c2p((radi * 20) / 32, 70));
+  return crv;
+}
+
 //draw helper lines
 function drawHelperLines() {
   stroke(0, 0, 255, 30);
@@ -176,8 +303,8 @@ function drawHelperLines() {
   for (var ci = 1; ci <= num_circles; ci++) {
     noFill();
     circle(cx, cy, (ci * (radi * 3)) / num_circles);
-    fill(0, 10);
-    textSize(8);
+    fill(0);
+    textSize(7);
     text(ci * 4, cx + (ci * (radi * 1.5)) / num_circles - 10, cy);
   }
   //helper slices
@@ -186,7 +313,8 @@ function drawHelperLines() {
     tx = cos(angle) * radi * 1.5;
     ty = sin(angle) * radi * 1.5;
     line(cx, cy, cx + tx, cy + ty);
-    textSize(9);
+    textSize(7);
+    fill(0);
     text(angle, cx + tx + 5, cy + ty + 5);
   }
 }
@@ -234,8 +362,33 @@ function setup() {
 function draw() {
   background(250);
   drawHelperLines(true);
-  drawCurve(prt_top());
+  drawCurve(prt_bhair());
+  drawCurve(prt_bhair(), 0, 0, true);
+  drawCurve(prt_thair());
+  drawCurve(prt_thair(), 0, 0, true);
+  drawCurve(prt_ear());
+  drawCurve(prt_ear(), 0, 0, true);
   drawCurve(prt_jaw());
-  drawCurve(prt_mth());
+  drawCurve(prt_jaw(), 0, 0, true);
+  drawCurve(prt_bmth());
+  drawCurve(prt_bmth(), 0, 0, true);
+  drawCurve(prt_mmth());
+  drawCurve(prt_mmth(), 0, 0, true);
+  drawCurve(prt_tmth());
+  drawCurve(prt_tmth(), 0, 0, true);
+  drawCurve(prt_teye());
+  drawCurve(prt_teye(), 0, 0, true);
+  drawCurve(prt_beye());
+  drawCurve(prt_beye(), 0, 0, true);
+  drawCurve(prt_tbro());
+  drawCurve(prt_tbro(), 0, 0, true);
+  drawCurve(prt_bbro());
+  drawCurve(prt_bbro(), 0, 0, true);
+  drawCurve(prt_nos1());
+  drawCurve(prt_nos1(), 0, 0, true);
+  drawCurve(prt_nos2());
+  drawCurve(prt_nos2(), 0, 0, true);
+  drawCurve(prt_nose());
+  drawCurve(prt_nose(), 0, 0, true);
   prt_eyes();
 }
