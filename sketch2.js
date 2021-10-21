@@ -42,6 +42,12 @@ let hash = tokenData.hash;
 let seed = parseInt(tokenData.hash.slice(2, 10), 16);
 let R = new NewRandom(seed);
 
+//load helper image
+let img;
+function preload() {
+  img = loadImage("imgs/gmishoot.jpeg");
+}
+
 function c2p(r, theta) {
   let x = r * cos(theta);
   let y = r * sin(theta);
@@ -76,15 +82,15 @@ function drawCurve(pts, offsetx = 0, offsety = 0, mirror = false) {
 function prt_bhair() {
   let crv = [];
   crv.push(c2p((radi * 28) / 32, 255));
-  crv.push(c2p((radi * 30) / 32, 270));
-  for (var i = 285; i <= 315; i += 15) {
-    crv.push(c2p(radi, i));
-  }
-  crv.push(c2p((radi * 30) / 32, 330));
-  crv.push(c2p((radi * 28) / 32, 345));
-  crv.push(c2p((radi * 28) / 32, 353));
-  crv.push(c2p((radi * 28) / 32, 360));
-  crv.push(c2p((radi * 28) / 32, 360));
+  crv.push(c2p((radi * 28) / 32, 270));
+  crv.push(c2p((radi * 30) / 32, 285));
+  crv.push(c2p((radi * 32) / 32, 300));
+  crv.push(c2p((radi * 31) / 32, 315));
+  crv.push(c2p((radi * 28) / 32, 330));
+  crv.push(c2p((radi * 26) / 32, 340));
+  crv.push(c2p((radi * 26) / 32, 353));
+  crv.push(c2p((radi * 26) / 32, 365));
+  crv.push(c2p((radi * 25) / 32, 370));
   return crv;
 }
 //top hairline
@@ -92,40 +98,38 @@ function prt_thair() {
   let crv = [];
   crv.push(c2p((radi * 44) / 32, 255));
   crv.push(c2p((radi * 44) / 32, 270));
-
   crv.push(c2p((radi * 43) / 32, 285));
-  crv.push(c2p((radi * 42) / 32, 300));
-  crv.push(c2p((radi * 41) / 32, 315));
-
-  crv.push(c2p((radi * 36) / 32, 330));
-  crv.push(c2p((radi * 32) / 32, 345));
-  crv.push(c2p((radi * 31) / 32, 353));
-  crv.push(c2p((radi * 30.5) / 32, 357.5));
-  crv.push(c2p((radi * 30) / 32, 10));
+  crv.push(c2p((radi * 40.5) / 32, 300));
+  crv.push(c2p((radi * 37) / 32, 315));
+  crv.push(c2p((radi * 33.5) / 32, 330));
+  crv.push(c2p((radi * 30.5) / 32, 345));
+  crv.push(c2p((radi * 29.5) / 32, 353));
+  crv.push(c2p((radi * 29) / 32, 358.5));
+  crv.push(c2p((radi * 29) / 32, 10));
   return crv;
 }
 //jaw part
 function prt_jaw() {
   let crv = [];
 
-  crv.push(c2p((radi * 40) / 32, 75));
-
-  crv.push(c2p((radi * 43) / 32, 90));
-
   crv.push(c2p((radi * 44) / 32, 105));
-  crv.push(c2p((radi * 40) / 32, 115));
-  crv.push(c2p((radi * 36) / 32, 125));
-  crv.push(c2p((radi * 32) / 32, 135));
-  crv.push(c2p((radi * 27.3) / 32, 152));
-  crv.push(c2p((radi * 26) / 32, 160));
+
+  crv.push(c2p((radi * 44) / 32, 90));
+
+  crv.push(c2p((radi * 43) / 32, 80));
+  crv.push(c2p((radi * 36) / 32, 65));
+  crv.push(c2p((radi * 33) / 32, 55));
+  crv.push(c2p((radi * 30.5) / 32, 45));
+  crv.push(c2p((radi * 27.3) / 32, 28));
+  crv.push(c2p((radi * 26) / 32, 20));
   return crv;
 }
 
 //bottom mouth line
 function prt_bmth() {
   let crv = [];
-  crv.push(c2p((radi * 32) / 32, 50));
   crv.push(c2p((radi * 32) / 32, 75));
+  crv.push(c2p((radi * 32) / 32, 80));
   crv.push(c2p((radi * 32) / 32, 90));
   crv.push(c2p((radi * 32) / 32, 105));
   return crv;
@@ -133,10 +137,9 @@ function prt_bmth() {
 //mid mouth line right-to-left
 function prt_mmth() {
   let crv = [];
-  crv.push(c2p((radi * 34) / 32, 65));
-  crv.push(c2p((radi * 31) / 32, 70));
-  crv.push(c2p((radi * 29.7) / 32, 75));
-  crv.push(c2p((radi * 28.7) / 32, 80));
+  crv.push(c2p((radi * 32) / 32, 65));
+  crv.push(c2p((radi * 30) / 32, 75));
+  crv.push(c2p((radi * 28.5) / 32, 83));
   crv.push(c2p((radi * 28.7) / 32, 90));
   crv.push(c2p((radi * 32) / 32, 106));
   return crv;
@@ -144,11 +147,11 @@ function prt_mmth() {
 //top mouth line
 function prt_tmth() {
   let crv = [];
-  crv.push(c2p((radi * 31) / 32, 60));
-  crv.push(c2p((radi * 27) / 32, 78));
-  crv.push(c2p((radi * 25.5) / 32, 84));
-  crv.push(c2p((radi * 26) / 32, 90));
-  crv.push(c2p((radi * 27) / 32, 105));
+  crv.push(c2p((radi * 30) / 32, 75));
+  crv.push(c2p((radi * 27.5) / 32, 80));
+  crv.push(c2p((radi * 26) / 32, 85));
+  crv.push(c2p((radi * 26.5) / 32, 90));
+  crv.push(c2p((radi * 27.5) / 32, 105));
   return crv;
 }
 
@@ -160,10 +163,10 @@ function prt_ear() {
   crv.push(c2p((radi * 28) / 32, 0));
   crv.push(c2p((radi * 31) / 32, -2));
   crv.push(c2p((radi * 34) / 32, 6));
-  crv.push(c2p((radi * 34) / 32, 15));
-  crv.push(c2p((radi * 33) / 32, 30));
-  crv.push(c2p((radi * 31) / 32, 34));
-  crv.push(c2p((radi * 28) / 32, 32));
+  crv.push(c2p((radi * 33.5) / 32, 15));
+  crv.push(c2p((radi * 31.5) / 32, 30));
+  crv.push(c2p((radi * 30) / 32, 35));
+  crv.push(c2p((radi * 28) / 32, 33));
   crv.push(c2p((radi * 24) / 32, 22));
   return crv;
 }
@@ -217,19 +220,19 @@ function prt_eyes() {
 function prt_beye() {
   let crv = [];
   crv.push(c2p((radi * 18) / 32, 0));
-  crv.push(c2p((radi * 18) / 32, 7));
-  crv.push(c2p((radi * 16) / 32, 13));
-  crv.push(c2p((radi * 13) / 32, 20));
-  crv.push(c2p((radi * 9) / 32, 31));
+  crv.push(c2p((radi * 18) / 32, 5));
+  crv.push(c2p((radi * 15) / 32, 13));
+  crv.push(c2p((radi * 12) / 32, 19));
+  crv.push(c2p((radi * 8) / 32, 31));
   return crv;
 }
 
 //above eye
 function prt_teye() {
   let crv = [];
-  crv.push(c2p((radi * 20) / 32, 4));
-  crv.push(c2p((radi * 18) / 32, 0));
-  crv.push(c2p((radi * 16) / 32, 350));
+  crv.push(c2p((radi * 24) / 32, 4));
+  crv.push(c2p((radi * 18.5) / 32, 0));
+  crv.push(c2p((radi * 16) / 32, 351));
   crv.push(c2p((radi * 12.5) / 32, 342));
   crv.push(c2p((radi * 8) / 32, 342));
   crv.push(c2p((radi * 4) / 32, 345));
@@ -262,22 +265,21 @@ function prt_tbro() {
 //nostrils, from inside out
 function prt_nos1() {
   let crv = [];
-  crv.push(c2p((radi * 19) / 32, 95));
+  crv.push(c2p((radi * 20) / 32, 100));
   crv.push(c2p((radi * 20) / 32, 90));
-  crv.push(c2p((radi * 19.4) / 32, 83));
-  crv.push(c2p((radi * 18.5) / 32, 78));
-  crv.push(c2p((radi * 19.5) / 32, 73));
-  crv.push(c2p((radi * 21) / 32, 67));
+  crv.push(c2p((radi * 19.5) / 32, 85));
+  //crv.push(c2p((radi * 19.3) / 32, 85));
+  crv.push(c2p((radi * 19) / 32, 80));
+  crv.push(c2p((radi * 20) / 32, 75));
   return crv;
 }
 function prt_nos2() {
   let crv = [];
-  crv.push(c2p((radi * 19) / 32, 95));
+  crv.push(c2p((radi * 21) / 32, 90));
   crv.push(c2p((radi * 20) / 32, 78));
-  crv.push(c2p((radi * 21) / 32, 72));
-  crv.push(c2p((radi * 20) / 32, 68));
-  crv.push(c2p((radi * 17) / 32, 68));
-  crv.push(c2p((radi * 14) / 32, 75));
+  crv.push(c2p((radi * 19) / 32, 73));
+  crv.push(c2p((radi * 17) / 32, 74));
+  crv.push(c2p((radi * 14) / 32, 80));
   return crv;
 }
 function prt_nose() {
@@ -361,6 +363,8 @@ function setup() {
 
 function draw() {
   background(250);
+  tint(255, 80);
+  image(img, 0, 0, DIM, DIM);
   drawHelperLines(true);
   drawCurve(prt_bhair());
   drawCurve(prt_bhair(), 0, 0, true);
@@ -391,4 +395,6 @@ function draw() {
   drawCurve(prt_nose());
   drawCurve(prt_nose(), 0, 0, true);
   prt_eyes();
+
+  noLoop();
 }
