@@ -1,4 +1,4 @@
-/* eslint no-unused-vars: "off", no-undef: "off", array-element-newline: "never",array-bracket-newline: "never" */
+/* eslint no-unused-vars: "off", max-len: {"code":200},no-undef: "off" */
 /// <reference path="/Users/matty/Dropbox/synthetic media/VSCODE/_PROJECT TEMPLATE NEW/TSDef/p5.global-mode.d.ts" />
 
 //PRNG
@@ -32,7 +32,7 @@ function random_hash() {
 }
 
 //===Seed stuff
-tokenData = { hash: random_hash() };
+tokenData = {hash: random_hash()};
 //fixed hash:
 //tokenData = { hash: "0x55ac46671239943c1111410215501820fc414444fff3495bf77aeed734446666" };
 //tokenData = { hash: "0x6666667676767676767676767676767676767676767676767676767676767676" };
@@ -76,6 +76,64 @@ function drawCurve(pts, offsetx = 0, offsety = 0, mirror = false) {
     if (!mirror) circle(pts[i][0] + offsetx, pts[i][1] + offsety, ppw);
   }
   pop();
+}
+
+function drawCurve2(pts0, pts1, offsetx = 0, offsety = 0, mirror = false) {
+  push();
+  translate(cx, cy);
+  noFill();
+  stroke("blue");
+  strokeWeight(2);
+  offsetx = mirror ? -offsetx : offsetx;
+  beginShape();
+  for (var i = 0; i < pts0.length; i++) {
+    var pnt = [];
+    pnt[0] = map(gr, 0, 1, pts0[i][0], pts1[i][0]);
+    pnt[1] = map(ga, 0, 1, pts0[i][1], pts1[i][1]);
+    if (mirror) {
+      curveVertex(((-pnt[0] * radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * radi) / 32) * sin(pnt[1]) + offsety);
+    } else {
+      curveVertex(((pnt[0] * radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * radi) / 32) * sin(pnt[1]) + offsety);
+    }
+
+    //debug circles
+  }
+  endShape();
+
+  //debug:draw helper circles
+  stroke(0, 0, 255, 45);
+  strokeWeight(1);
+  for (var i = 0; i < pts0.length; i++) {
+    var pnt = [];
+    pnt[0] = map(gr, 0, 1, pts0[i][0], pts1[i][0]);
+    pnt[1] = map(ga, 0, 1, pts0[i][1], pts1[i][1]);
+    if (!mirror) circle(((pnt[0] * radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * radi) / 32) * sin(pnt[1]) + offsety, ppw);
+  }
+  pop();
+}
+
+function drawAll() {
+  for (var i = 0; i < curves.length; i++) {
+    if (randomgr) gr = R.random_dec();
+    drawCurve2(curves[i].points0, curves[i].points1);
+    if (curves[i].mirror) drawCurve2(curves[i].points0, curves[i].points1, 0, 0, true);
+  }
+}
+
+function loadCurves() {
+  //bottom hair
+  /* prettier-ignore */
+  curves.push({ //bottom hairline
+    points0:[[27, 255],[27, 270],[28, 285],[28, 300],[28, 315],[26, 330],[25, 340],[25, 353],[26, 365],[25, 370]],
+    points1:[[40, 255],[40, 270],[39, 285],[38, 300],[34, 315],[31, 330],[30, 340],[28, 353],[26, 365],[25, 370]],
+    mirror:true,
+  });
+  /* prettier-ignore */
+  curves.push({//top hairline
+    points0: [[42, 255],[42, 270],[41, 285],[38.5, 300],[36, 315],[33, 330],[30.5, 345],[29.5, 353],[29, 358.5],[29, 10],],
+    points1: [[48, 255],[48, 270],[48, 285],[46, 300],[43, 315],[38, 330],[34, 345],[32, 353],[31, 358.5],[31, 10],],
+    mirror: true,
+  });
 }
 
 //bottom hairline
@@ -337,6 +395,11 @@ var jawpoint, jawtop; //jawpoint is where circle and rect intersect, jawtop-jaw 
 var mouthw, mouthh;
 var curve_tightness, num_circles, num_slices;
 var tmpl1point, tmpl2left, tmpl2right, tmpl3left, tmpl3right, earendh, earendw;
+var curves = [];
+///global radius and angle to animate points
+var gr = 1;
+var ga = 0;
+var randomgr = true;
 
 function setup() {
   tWIDTH = window.innerWidth;
@@ -359,17 +422,27 @@ function setup() {
   gui = createGui("control");
   sliderRange(1, DIM, 1);
   gui.addGlobals("radi");
+  sliderRange(0, 1, 0.01);
+  gui.addGlobals("gr");
+  gui.addGlobals("ga");
+  gui.addGlobals("randomgr");
+
+  loadCurves();
 }
 
 function draw() {
   background(250);
-  tint(255, 80);
-  image(img, 0, 0, DIM, DIM);
+  tint(255, 100);
+  //image(img, 0, 0, DIM, DIM);
+  drawAll();
+
   drawHelperLines(true);
+  /*
   drawCurve(prt_bhair());
-  drawCurve(prt_bhair(), 0, 0, true);
+  drawCurve(prt_bhair(), 0, 0, true);  
   drawCurve(prt_thair());
-  drawCurve(prt_thair(), 0, 0, true);
+  drawCurve(prt_thair(), 0, 0, true);*/
+
   drawCurve(prt_ear());
   drawCurve(prt_ear(), 0, 0, true);
   drawCurve(prt_jaw());
