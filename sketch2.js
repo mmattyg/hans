@@ -175,10 +175,18 @@ function updateSaveme() {
   }
   str += "], mirror:";
   if (go.mirror) {
-    str += "true,}";
+    str += "true";
   } else {
-    a = str += "false,}";
+    a = str += "false";
   }
+  str += ", fill:";
+  if (go.fill) {
+    str += "true,";
+  } else {
+    a = str += "false,";
+  }
+
+  str += "}";
   go.saveme = str;
 }
 
