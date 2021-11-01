@@ -97,9 +97,20 @@ function drawCurve2(pts0, pts1, offsetx = 0, offsety = 0, mirror = false) {
   translate(cx, cy);
   noFill();
   stroke(30, 50);
-  strokeWeight(1);
+  strokeWeight(2);
   offsetx = mirror ? -offsetx : offsetx;
   beginShape();
+  //first point twice
+  if (pts0.length > 1) {
+    var pnt = [];
+    pnt[0] = map(go.gr, 0, 1, pts0[0][0], pts1[0][0]);
+    pnt[1] = map(go.gr, 0, 1, pts0[0][1], pts1[0][1]);
+    if (mirror) {
+      curveVertex(((-pnt[0] * go.radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * go.radi) / 32) * sin(pnt[1]) + offsety);
+    } else {
+      curveVertex(((pnt[0] * go.radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * go.radi) / 32) * sin(pnt[1]) + offsety);
+    }
+  }
   for (var i = 0; i < pts0.length; i++) {
     var pnt = [];
     pnt[0] = map(go.gr, 0, 1, pts0[i][0], pts1[i][0]);
@@ -109,12 +120,22 @@ function drawCurve2(pts0, pts1, offsetx = 0, offsety = 0, mirror = false) {
     } else {
       curveVertex(((pnt[0] * go.radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * go.radi) / 32) * sin(pnt[1]) + offsety);
     }
-
-    //debug circles
+  }
+  //last point twice
+  if (pts1.length > 1) {
+    var pnt = [];
+    pnt[0] = map(go.gr, 0, 1, pts0[pts1.length - 1][0], pts1[pts1.length - 1][0]);
+    pnt[1] = map(go.gr, 0, 1, pts0[pts1.length - 1][1], pts1[pts1.length - 1][1]);
+    if (mirror) {
+      curveVertex(((-pnt[0] * go.radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * go.radi) / 32) * sin(pnt[1]) + offsety);
+    } else {
+      curveVertex(((pnt[0] * go.radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * go.radi) / 32) * sin(pnt[1]) + offsety);
+    }
   }
   endShape();
 
   //debug:draw helper circles
+  /*
   stroke(0, 0, 255, 45);
   strokeWeight(1);
   for (var i = 0; i < pts0.length; i++) {
@@ -122,7 +143,7 @@ function drawCurve2(pts0, pts1, offsetx = 0, offsety = 0, mirror = false) {
     pnt[0] = map(go.gr, 0, 1, pts0[i][0], pts1[i][0]);
     pnt[1] = map(go.ga, 0, 1, pts0[i][1], pts1[i][1]);
     if (!mirror) circle(((pnt[0] * go.radi) / 32) * cos(pnt[1]) + offsetx, ((pnt[0] * go.radi) / 32) * sin(pnt[1]) + offsety, ppw);
-  }
+  }*/
   pop();
 }
 
@@ -159,6 +180,13 @@ function updateSaveme() {
     a = str += "false,}";
   }
   go.saveme = str;
+}
+
+function keyPressed(e) {
+  if (e.keyCode == 90) {
+    manualCurve0.pop();
+    manualCurve1.pop();
+  }
 }
 
 function mousePressed() {
@@ -396,17 +424,54 @@ function drawManualCurve(pts0, pts1, offsetx = 0, offsety = 0, mirror = false) {
 function loadCurves() {
   //bottom hair
   /* prettier-ignore */
+  /* original (by matty)
   curves.push({ //bottom hairline
     points0:[[27, 255],[27, 270],[28, 285],[28, 300],[28, 315],[26, 330],[25, 340],[25, 353],[26, 365],[25, 370],],
     points1:[[40, 255],[40, 270],[39, 285],[38, 300],[34, 315],[31, 330],[30, 340],[28, 353],[26, 365],[25, 370],],
     mirror:true,
-  });
-  /* prettier-ignore */
+  });*/
+  /* prettier-ignore 
   curves.push({//top hairline
     points0: [[42, 255],[42, 270],[41, 285],[38.5, 300],[36, 315],[33, 330],[30.5, 345],[29.5, 353],[29, 358.5],[29, 10],],
     points1: [[48, 255],[48, 270],[48, 285],[46, 300],[43, 315],[38, 330],[34, 345],[32, 353],[31, 358.5],[31, 10],],
     mirror: true,
-  });
+  })*/
+  /* prettier-ignore */
+  curves.push(//nose tip
+  {points0:[[18.8,80.1],[19,82.9],[19.8,86.6],[20.2,90],], points1:[[22.3,90.2],[21.8,87.1],[19.3,81.1],[19.1,78],], mirror:true,}
+  );
+  /* prettier-ignore */
+  curves.push(//nostril
+    {points0:[[17.1,74.1],[18.3,73],[19.6,74.9],[19.7,81.9],], points1:[[16.3,74.4],[16.5,67.1],[20.2,66.6],[20.6,81.6],], mirror:true,}
+    );
+  /* prettier-ignore */
+  curves.push(//eyes
+    {points0:[[6.4,6.6],[8.7,356.6],[12,353.9],[15,356.6],[16.8,0],[16.2,1.8],[14.3,6.9],[9.9,10.8],[7.5,7.3],], points1:[[5.5,2.7],[8.2,346],[12.4,345.1],[15.8,352.8],[18.1,0.6],[17.8,2.5],[14.6,13.4],[9.8,20.1],[6.1,13.3],], mirror:true,}
+    );
+  /* prettier-ignore */
+  curves.push(//eye brows
+    {points0:[[8.1,314.4],[10.9,324.1],[16,336.9],[19.8,349.1],[19.2,346.3],[17.2,339.1],[15.3,331.9],[10.4,316.2],], points1:[[4.6,305.9],[10.2,327.7],[14.6,336.6],[18.2,345.9],[22.2,355.9],[17.5,337.7],[12.8,321.3],[7.3,297.7],], mirror:true,}
+    );
+  /* prettier-ignore */
+  curves.push(//upperlip
+    {points0:[[27.5,90],[27.3,83.9],[28.2,80],[28.8,77],], points1:[[25.5,90],[25.2,85.7],[27.1,79.1],[28.6,73.5],], mirror:true,}
+    );
+  /* prettier-ignore */
+  curves.push(//middle lip
+    {points0:[[29.8,89.8],[29.6,82.8],[30.3,79],[30.7,76.1],], points1:[[28,90.2],[27.6,82.6],[29.2,76.8],[30.1,73.6],], mirror:true,}
+  );
+  /* prettier-ignore */
+  curves.push(//lower lip
+    {points0:[[31.1,90],[31,84.2],[30.8,78.1],], points1:[[33.1,90.4],[33,84.2],[32.6,77],], mirror:true,}
+    );
+  /* prettier-ignore */
+  curves.push(//ears+jaw
+    {points0:[[26,5],[28.1,359.6],[30.6,358],[32.7,0.6],[33.7,5.9],[33.1,15.9],[31.8,28.5],[29.9,35],[28,33.3],[27.1,28.6],[30.6,45.5],[33.2,55.3],[36,65.1],[41.8,79.2],[43.8,85.4],[44,90.2],], points1:[[25.8,5.4],[28.2,357.9],[31.4,354.9],[34.4,0],[37.2,9.2],[37.4,18.3],[35,29.6],[31.2,38.4],[28.4,34],[26.9,28.7],[33.1,44.1],[40.2,57.1],[43.8,66.5],[46.3,74.4],[48,83.3],[48.7,90],], mirror:true,}
+    );
+  /* prettier-ignore */
+  curves.push(//hairline
+    {points0:[[25.6,5.3],[25.1,352.8],[24.2,334.9],[25.7,326.5],[29.2,311.3],[30.9,297.6],[29,281.1],[26.9,270],], points1:[[25.9,4.6],[27.9,344.3],[29.1,330.1],[34.2,316.5],[37,307.8],[40.2,296],[41,281.8],[40.8,270],], mirror:true,}
+    );
 }
 
 //bottom hairline
@@ -523,7 +588,7 @@ function prt_eyes() {
   arc(lc[0], lc[1], go.radi / 7, go.radi / 7, -50, 90);
   arc(lc[0], lc[1], go.radi / 7, go.radi / 7, 90, 230);
   pop();
-
+  /*
   let crv = []; //top arc, right from right to left
   crv.push([rc[0] - go.radi / 5, rc[1]]);
   crv.push([rc[0] - go.radi / 6, rc[1]]);
@@ -545,6 +610,7 @@ function prt_eyes() {
   crv.push([rc[0] + go.radi / 6.2, rc[1] - go.radi / 32]);
   drawCurve(crv, 0, go.radi / 32);
   drawCurve(crv, 0, go.radi / 32, true);
+  */
 }
 
 //under eye
@@ -680,6 +746,16 @@ function addGUI() {
     },
   };
   //get curve button
+  var gebut = {
+    getb: function () {
+      var tmpcurves;
+      var str = "tmpcurves = " + go.getme;
+      eval(str);
+      go.mirror = tmpcurves.mirror;
+      manualCurve0 = tmpcurves.points0;
+      manualCurve1 = tmpcurves.points1;
+    },
+  };
 
   myGUI.add(go, "radi", 10, 1000);
   myGUI.add(go, "gr", 0, 1, 0.01);
@@ -687,11 +763,11 @@ function addGUI() {
   myGUI.add(randadd, "add").name("Randomize");
   myGUI.add(go, "tool", ["None", "Draw", "Erase"]);
   myGUI.add(go, "fill");
-  myGUI.add(go, "mirror");
+  myGUI.add(go, "mirror").listen();
   myGUI.add(go, "saveme").name("Save me").listen();
   myGUI.add(go, "getme").name("Get me");
   var dn = myGUI.addFolder("Danger");
-  dn.add(randadd, "add").name("Get now");
+  dn.add(gebut, "getb").name("Get now");
   dn.add(clearbut, "clr").name("Clear all");
 }
 
@@ -746,13 +822,13 @@ function draw() {
   drawAll();
 
   drawManual();
-
+  prt_eyes();
   //drawHelperLines(true);
   /*
   drawCurve(prt_bhair());
   drawCurve(prt_bhair(), 0, 0, true);  
   drawCurve(prt_thair());
-  drawCurve(prt_thair(), 0, 0, true);*/
+  drawCurve(prt_thair(), 0, 0, true);
 
   drawCurve(prt_ear());
   drawCurve(prt_ear(), 0, 0, true);
@@ -778,7 +854,7 @@ function draw() {
   drawCurve(prt_nos2(), 0, 0, true);
   drawCurve(prt_nose());
   drawCurve(prt_nose(), 0, 0, true);
-  prt_eyes();
+  prt_eyes();*/
 
   //noLoop();
 }
